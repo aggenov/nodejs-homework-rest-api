@@ -13,6 +13,7 @@ const addContactShema = Joi.object({
     "string.base": '"phone" not string',
     "any.required": "missing required phone field",
   }),
+  favorite: Joi.boolean(),
 });
 
 module.exports = addContactShema;
