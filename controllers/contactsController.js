@@ -14,22 +14,24 @@ const {
 const getContactsController = async (req, res) => {
   const { _id: owner } = req.user;
   const { page = 1, limit = 10 } = req.query;
+
   const skip = (page - 1) * limit;
   const contacts = await getContacts(owner, { skip, limit });
-  const total = contacts.length;
+  // const total = contacts.length;
+  const allContacts = await getContacts(owner, { skip: 1, limit: 10000 });
+  const total = allContacts.length;
 
-  if (total < limit) {
-    return res.json({
-      // owner: contacts[0].owner,
-      total: total,
-      contacts,
-    });
-  }
+  // if (total < Number(limit)) {
+  //   return res.json({
+  //     // owner: contacts[0].owner,
+  //     total: total,
+  //     contacts,
+  //   });
+  // }
 
   res.json({
-    // owner: result[0].owner,
-    page: page,
-    per_page: limit,
+    page: Number(page),
+    per_page: Number(limit),
     total: total,
     contacts,
   });
