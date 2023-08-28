@@ -1,7 +1,10 @@
 const Contact = require("../db/models/contactsModel");
 
-const getContacts = async () => {
-  const result = await Contact.find();
+const getContacts = async (owner, { skip, limit }) => {
+  const result = await Contact.find({ owner }, "name email phone favorite", {
+    skip,
+    limit,
+  }).populate("owner", "name email");
   return result;
 };
 const getContactById = async (id) => {
@@ -20,7 +23,7 @@ const removeContact = async (id) => {
 };
 
 const updateContact = async (id, data) => {
-  const result = await Contact.findByIdAndUpdate(id, data);
+  const result = await Contact.findByIdAndUpdate(id, data, { new: true });
   return result;
 };
 

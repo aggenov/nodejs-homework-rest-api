@@ -12,8 +12,27 @@ const {
 } = require("../servises/contactsServises");
 
 const getContactsController = async (req, res) => {
-  const result = await getContacts();
-  res.json(result);
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const contacts = await getContacts(owner, { skip, limit });
+  const total = contacts.length;
+
+  if (total < limit) {
+    return res.json({
+      // owner: contacts[0].owner,
+      total: total,
+      contacts,
+    });
+  }
+
+  res.json({
+    // owner: result[0].owner,
+    page: page,
+    per_page: limit,
+    total: total,
+    contacts,
+  });
 };
 
 const getByIdController = async (req, res) => {
@@ -31,7 +50,9 @@ const addContactController = async (req, res) => {
   if (error) {
     throw HttpError(400, error.message);
   }
-  const result = await addContact(req.body);
+  const { _id: owner } = req.user;
+  console.log("owner ", owner);
+  const result = await addContact({ ...req.body, owner });
   res.status(201).json(result);
 };
 
