@@ -53,7 +53,6 @@ const addContactController = async (req, res) => {
     throw HttpError(400, error.message);
   }
   const { _id: owner } = req.user;
-  console.log("owner ", owner);
   const result = await addContact({ ...req.body, owner });
   res.status(201).json(result);
 };
