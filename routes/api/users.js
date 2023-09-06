@@ -1,13 +1,22 @@
 const express = require("express");
 
-const { validateBody, authenticate } = require("../../middlewares");
-const { registerSchema, loginSchema } = require("../../schemas");
+const fs = require("fs/promises");
+const path = require("path");
+
+const { validateBody, authenticate, upload } = require("../../middlewares");
+const {
+  registerSchema,
+  loginSchema,
+  updateSubscriptionSchema,
+} = require("../../schemas");
 
 const {
   registerController,
   loginController,
   logoutController,
   getCurrentController,
+  updateSubscriptionController,
+  updateAvatarController,
 } = require("../../controllers/usersController");
 
 const router = express.Router();
@@ -18,6 +27,9 @@ router.post("/register", validateBody(registerSchema), registerController);
 // login / signin /
 router.post("/login", validateBody(loginSchema), loginController);
 
+// current User
+router.get("/current", authenticate, getCurrentController);
+
 // logout
 router.post(
   "/logout",
@@ -26,7 +38,21 @@ router.post(
   logoutController
 );
 
-// current User
-router.get("/current", authenticate, getCurrentController);
+//update subscription
+router.patch(
+  "/",
+  authenticate,
+  validateBody(updateSubscriptionSchema),
+  updateSubscriptionController
+);
+
+// update avatars
+router.patch(
+  "/avatars",
+  authenticate,
+  // validateBody(updateAvatarSchema),
+  upload.single("avatar"),
+  updateAvatarController
+);
 
 module.exports = router;

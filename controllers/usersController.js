@@ -13,6 +13,13 @@ require("dotenv").config();
 
 const { SECRET_KEY } = process.env;
 
+const fs = require("fs/promises");
+const path = require("path");
+
+const gravatar = require("gravatar");
+
+const Jimp = require("jimp");
+
 const registerController = async (req, res) => {
   const { error } = registerSchema.validate(req.body);
   if (error) {
@@ -25,7 +32,13 @@ const registerController = async (req, res) => {
   }
   const hashPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await addUser({ ...req.body, password: hashPassword });
+  const avatarURL = gravatar.url(email);
+
+  const newUser = await addUser({
+    ...req.body,
+    password: hashPassword,
+    avatarURL: avatarURL,
+  });
 
   res.status(201).json({
     user: {
@@ -84,9 +97,56 @@ const getCurrentController = async (req, res) => {
   });
 };
 
+const updateSubscriptionController = async (req, res) => {
+  const { _id } = req.user;
+  const newSubscription = req.body.subscription;
+
+  const user = await User.findByIdAndUpdate(
+    _id,
+    { subscription: newSubscription },
+    { new: true }
+  );
+
+  if (!user) {
+    res.status(401).json({ message: "Not authorized" });
+    return;
+  }
+
+  await user.save();
+
+  res.json({
+    email: user.email,
+    subscription: user.subscription,
+  });
+};
+
+const updateAvatarController = async (req, res) => {
+  // adress  public/avatars  folder
+  const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+  const { path: tempUpload, originalname } = req.file;
+
+  const { _id } = req.user;
+  const filename = `${_id}_${originalname}`;
+
+  const resultUpload = path.join(avatarsDir, filename);
+
+  await fs.rename(tempUpload, resultUpload);
+
+  await Jimp.read(resultUpload)
+    .then((image) => image.resize(250, 250).write(resultUpload))
+    .catch((error) => console.log(error));
+
+  const avatarURL = path.join("avatars", filename);
+  await User.findByIdAndUpdate(_id, { avatarURL });
+
+  res.json({ avatarURL });
+};
+
 module.exports = {
   registerController: controllerWrapper(registerController),
   loginController: controllerWrapper(loginController),
   logoutController: controllerWrapper(logoutController),
   getCurrentController: controllerWrapper(getCurrentController),
+  updateSubscriptionController: controllerWrapper(updateSubscriptionController),
+  updateAvatarController: controllerWrapper(updateAvatarController),
 };

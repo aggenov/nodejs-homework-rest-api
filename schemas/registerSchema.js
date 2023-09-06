@@ -14,6 +14,7 @@ const registerSchema = Joi.object({
     "string.base": '"password" not string',
     "any.required": "missing required password field",
   }),
+  token: Joi.string(),
 });
 
 module.exports = registerSchema;
