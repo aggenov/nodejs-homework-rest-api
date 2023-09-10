@@ -6,7 +6,7 @@ const { registerSchema, loginSchema } = require("../schemas");
 
 const bcrypt = require("bcrypt");
 
-const { addUser, verifyUser } = require("../servises/usersServises");
+const { addUser } = require("../servises/usersServises");
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
