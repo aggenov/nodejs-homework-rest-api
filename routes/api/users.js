@@ -8,6 +8,7 @@ const {
   registerSchema,
   loginSchema,
   updateSubscriptionSchema,
+  emailSchema,
 } = require("../../schemas");
 
 const {
@@ -17,6 +18,8 @@ const {
   getCurrentController,
   updateSubscriptionController,
   updateAvatarController,
+  verifyEmailController,
+  resendVerifyEmailController,
 } = require("../../controllers/usersController");
 
 const router = express.Router();
@@ -33,8 +36,8 @@ router.get("/current", authenticate, getCurrentController);
 // logout
 router.post(
   "/logout",
-  validateBody(loginSchema),
   authenticate,
+  validateBody(loginSchema),
   logoutController
 );
 
@@ -50,9 +53,14 @@ router.patch(
 router.patch(
   "/avatars",
   authenticate,
-  // validateBody(updateAvatarSchema),
   upload.single("avatar"),
   updateAvatarController
 );
+
+// verifyEmail
+router.get("/verify/:verificationToken", verifyEmailController);
+
+//resend verifyToken to email
+router.post("/verify", validateBody(emailSchema), resendVerifyEmailController);
 
 module.exports = router;

@@ -6,7 +6,7 @@ async function dbConnect() {
     .connect(DB_URI)
     .then(console.log("Database connection successful"))
     .catch((error) => {
-      console.log(error.message);
+      console.error(error.message);
       process.exit(1);
     });
 }
