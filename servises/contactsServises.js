@@ -4,11 +4,15 @@ const getContacts = async (owner, { skip, limit }) => {
   const result = await Contact.find({ owner }, "name email phone favorite", {
     skip,
     limit,
-  }).populate("owner", "name email");
+  })
+    .populate("owner", "name email")
+    .exec();
+
   return result;
 };
 const getContactById = async (id) => {
-  const result = await Contact.findById(id);
+  const result = await Contact.findById(id).exec();
+
   return result;
 };
 
@@ -18,17 +22,21 @@ const addContact = async (data) => {
 };
 
 const removeContact = async (id) => {
-  const result = await Contact.findByIdAndRemove(id);
+  const result = await Contact.findByIdAndRemove(id).exec();
   return result;
 };
 
 const updateContact = async (id, data) => {
-  const result = await Contact.findByIdAndUpdate(id, data, { new: true });
+  const result = await Contact.findByIdAndUpdate(id, data, {
+    new: true,
+  }).exec();
   return result;
 };
 
 const updateStatusContact = async (id, data) => {
-  const result = await Contact.findByIdAndUpdate(id, data, { new: true });
+  const result = await Contact.findByIdAndUpdate(id, data, {
+    new: true,
+  }).exec();
   return result;
 };
 

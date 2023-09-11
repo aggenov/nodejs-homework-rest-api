@@ -3,7 +3,7 @@ const { HttpError } = require("../helpers");
 
 const addUser = async (data) => {
   const { email } = data;
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).exec();
   if (user) {
     throw HttpError(409, "Email in use");
   }
